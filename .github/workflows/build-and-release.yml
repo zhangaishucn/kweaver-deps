@@ -1,0 +1,31 @@
+name: Build and Release workflow-lib
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create release archive
+        run: |
+          cd autoflow/workflow-lib
+          tar -czvf ../../autoflow-workflow-lib.tar.gz .
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: ./autoflow-workflow-lib.tar.gz
